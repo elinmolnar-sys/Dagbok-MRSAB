@@ -68,8 +68,7 @@ button {
 
 <div class="container">
 
-<div class="logo">
-    <img src="https://i.postimg.cc/cLCPvstX/MRSAB-Logga.png" alt="Företagslogotyp">
+
 </div>
 
 <h1>Daglig Arbetsrapport</h1>
