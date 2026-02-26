@@ -1,4 +1,3 @@
-# Dagbok-MRSAB<!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
