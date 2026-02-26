@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
@@ -27,6 +28,8 @@ body {
 }
 .logo img {
     max-width: 180px;
+    height: auto;
+    display: inline-block;
 }
 h1 {
     text-align: center;
@@ -55,126 +58,146 @@ button {
     border: none;
     border-radius: 6px;
     font-size: 16px;
+    cursor: pointer;
+}
+button:disabled {
+    background-color: #7a99b5;
+    cursor: not-allowed;
 }
 .success {
     margin-top: 15px;
     color: green;
     font-weight: bold;
+    text-align: center;
 }
+
+/* Lösenordsskydd */
+#dagbokContainer { display: none; }
 </style>
 </head>
 
 <body>
 
 <div class="container">
-.logo img {
-    max-width: 180px;
-    height: auto;
-}
-<div class="logo">
-    <img src="https://i.postimg.cc/cLCPvstX/MRSAB-Logga.png" alt="Företagslogotyp">
-</div>
 
-<h1>Daglig Arbetsrapport</h1>
+    <div class="logo">
+        <img src="images/logga.png" alt="Företagslogotyp">
+    </div>
 
-<form id="dagbokForm">
+    <h1>Daglig Arbetsrapport</h1>
 
-<label>Datum</label>
-<input type="date" name="datum" required>
+    <!-- Lösenordsskydd -->
+    <label>Lösenord:</label>
+    <input type="password" id="accessPass" placeholder="Ange lösenord">
+    <button id="checkPass">Öppna dagbok</button>
 
-<label>Namn på arbetstagare</label>
-<input type="text" name="namn" required>
+    <div id="dagbokContainer">
+        <form id="dagbokForm">
 
-<label>Arbetarens e-post (för kopia)</label>
-<input type="email" name="worker_email" required>
+            <label>Datum</label>
+            <input type="date" name="datum" required>
 
-<label>Antal resurs/person</label>
-<input type="number" name="antal_resurs">
+            <label>Namn på arbetstagare</label>
+            <input type="text" name="namn" required>
 
-<label>Arbetsordernummer</label>
-<input type="text" name="ordernummer">
+            <label>Arbetarens e-post (för kopia)</label>
+            <input type="email" name="worker_email" required>
 
-<label>Arbetsplats / Adress</label>
-<input type="text" name="plats">
+            <label>Antal resurs/person</label>
+            <input type="number" name="antal_resurs">
 
-<label>Starttid</label>
-<input type="time" name="starttid">
+            <label>Arbetsordernummer</label>
+            <input type="text" name="ordernummer">
 
-<label>Sluttid</label>
-<input type="time" name="sluttid">
+            <label>Arbetsplats / Adress</label>
+            <input type="text" name="plats">
 
-<label>Rast (minuter)</label>
-<input type="number" name="rast">
+            <label>Starttid</label>
+            <input type="time" name="starttid">
 
-<label>Fordon / Maskin</label>
-<input type="text" name="fordon">
+            <label>Sluttid</label>
+            <input type="time" name="sluttid">
 
-<label>Utfört arbete</label>
-<textarea name="arbete"></textarea>
+            <label>Rast (minuter)</label>
+            <input type="number" name="rast">
 
-<label>Avvikelser / Noteringar</label>
-<textarea name="avvikelser"></textarea>
+            <label>Fordon / Maskin</label>
+            <input type="text" name="fordon">
 
-<button type="submit">Skicka rapport</button>
+            <label>Utfört arbete</label>
+            <textarea name="arbete"></textarea>
 
-<div class="success" id="successMsg"></div>
+            <label>Avvikelser / Noteringar</label>
+            <textarea name="avvikelser"></textarea>
 
-</form>
+            <button type="submit">Skicka rapport</button>
+            <div class="success" id="successMsg"></div>
 
+        </form>
+    </div>
 </div>
 
 <script>
 (function(){
-    emailjs.init("8QT8MtJ4IdJNiRo4A");
+    emailjs.init("8QT8MtJ4IdJNiRo4A"); // Din public key
 })();
 
+// Lösenordsskydd
+document.getElementById("checkPass").addEventListener("click", function(){
+    const pass = document.getElementById("accessPass").value;
+    if(pass === "BYGG123"){ // Ändra till ditt lösenord
+        document.getElementById("dagbokContainer").style.display = "block";
+        this.style.display = "none";
+        document.getElementById("accessPass").style.display = "none";
+    } else {
+        alert("Fel lösenord!");
+    }
+});
+
+// Skicka formulär
 document.getElementById("dagbokForm").addEventListener("submit", function(e){
     e.preventDefault();
-
-    const btn = document.querySelector("button");
+    const btn = this.querySelector("button");
     btn.disabled = true;
     btn.innerHTML = "Skickar...";
 
-    // Hämta tider
-    const start = document.querySelector('[name="starttid"]').value;
-    const end = document.querySelector('[name="sluttid"]').value;
-    const rast = parseInt(document.querySelector('[name="rast"]').value) || 0;
-
+    // Beräkna arbetstid
+    const start = this.querySelector('[name="starttid"]').value;
+    const end = this.querySelector('[name="sluttid"]').value;
+    const rast = parseInt(this.querySelector('[name="rast"]').value) || 0;
     let arbetstid = "";
-
     if(start && end){
         const startTime = new Date(`1970-01-01T${start}:00`);
         const endTime = new Date(`1970-01-01T${end}:00`);
-        let diff = (endTime - startTime) / 1000 / 60; // minuter
-        diff -= rast;
+        let diff = (endTime - startTime) / 1000 / 60 - rast;
         arbetstid = (diff/60).toFixed(2) + " timmar";
     }
 
-    // Lägg till beräknad arbetstid som hidden field
+    // Lägg till arbetstid som hidden
     let hidden = document.createElement("input");
     hidden.type = "hidden";
     hidden.name = "arbetstid";
     hidden.value = arbetstid;
     this.appendChild(hidden);
 
+    // Skicka med EmailJS
     emailjs.sendForm(
-        "service_eehhitu",
-        "template_5xvghx2",
+        "service_eehhitu", // Ditt Service ID
+        "template_5xvghx2", // Ditt Template ID
         this
-    ).then(function(){
-  
-fetch("DIN_WEBAPP_URL_HÄR", {
-    method: "POST",
-    body: JSON.stringify(Object.fromEntries(new FormData(this))),
-});
-        document.getElementById("successMsg").innerHTML =
-        "✅ Rapporten är skickad till kontoret och en kopia till dig.";
+    ).then(() => {
+        // Skicka till Google Apps Script
+        fetch("DIN_WEBAPP_URL_HÄR", {
+            method: "POST",
+            body: JSON.stringify(Object.fromEntries(new FormData(this))),
+        });
 
-        document.getElementById("dagbokForm").reset();
+        document.getElementById("successMsg").innerHTML =
+            "✅ Rapporten skickad, loggad och PDF skapad.";
+        this.reset();
         btn.disabled = false;
         btn.innerHTML = "Skicka rapport";
-
-    }, function(error){
+    }, (error) => {
         alert("Något gick fel. Försök igen.");
         console.error(error);
         btn.disabled = false;
@@ -182,3 +205,5 @@ fetch("DIN_WEBAPP_URL_HÄR", {
     });
 });
 </script>
+</body>
+</html>
