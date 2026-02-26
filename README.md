@@ -68,9 +68,9 @@ button {
 
 <div class="container">
 
-
-</div><img width="1001" height="608" alt="MRSAB Logga" src="https://github.com/user-attachments/assets/448ee7a0-d5b1-4acb-a888-87d4313f685b" />
-
+<div class="logo">
+    <img src="https://i.postimg.cc/cLCPvstX/MRSAB-Logga.png" alt="Företagslogotyp">
+</div>
 
 <h1>Daglig Arbetsrapport</h1>
 
