@@ -67,7 +67,10 @@ button {
 <body>
 
 <div class="container">
-
+.logo img {
+    max-width: 180px;
+    height: auto;
+}
 <div class="logo">
     <img src="https://i.postimg.cc/cLCPvstX/MRSAB-Logga.png" alt="Företagslogotyp">
 </div>
